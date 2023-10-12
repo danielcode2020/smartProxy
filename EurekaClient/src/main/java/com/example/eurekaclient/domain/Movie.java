@@ -14,7 +14,6 @@ public class Movie extends MongoDocument {
     public BigDecimal budget;
 
     public String description;
-
     public String getName() {
         return name;
     }
@@ -56,5 +55,7 @@ public class Movie extends MongoDocument {
                 ", description='" + description + '\'' +
                 '}';
     }
+
+
     
 }

@@ -1,14 +1,17 @@
 package com.example.eurekaclient.domain;
 
-import nonapi.io.github.classgraph.json.Id;
+
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Document
 public abstract class MongoDocument {
-    @Id
+
+    @MongoId
+    @org.springframework.data.annotation.Id
     public UUID uuid;
     public Instant lastUpdatedTime;
 

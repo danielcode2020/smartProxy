@@ -24,7 +24,6 @@ public class MoviesAPI {
         this.movieRepository = movieRepository;
     }
 
-    @Cacheable("movies")
     @GetMapping
     public List<Movie> getAll(){
         log.info("REST request to get all movies");
@@ -42,14 +41,13 @@ public class MoviesAPI {
     @GetMapping("/{id}")
     public Optional<Movie> getMovieById(@PathVariable UUID id){
         log.info("REST request to get movie by id : {}", id);
-        return movieRepository.findFirstByUuid(id);
+        return movieRepository.findById(id);
     }
 
     @DeleteMapping
-    public void deleteMovies() {
-        log.info("REST request to delete all movies by id ");
-        // pentru stergere trebuie implementata methoda delete by UUID
-        movieRepository.deleteAll();
+    public void deleteMovies(@RequestParam UUID id) {
+        log.info("REST request to movie by id {} ",id);
+        movieRepository.deleteById(id);
     }
 }
 
