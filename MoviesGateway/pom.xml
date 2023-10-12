@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>EurekaGateway</artifactId>
+	<artifactId>MoviesGateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>EurekaGateway</name>
 	<description>EurekaGateway</description>
