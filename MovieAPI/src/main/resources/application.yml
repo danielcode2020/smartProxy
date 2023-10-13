@@ -1,5 +1,8 @@
-
 spring:
+  rabbitmq:
+    host: localhost
+    username: rmuser
+    password: rmpassword
   application:
     name: eureka-client
   data:
@@ -23,3 +26,7 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+moviesapi:
+  sending-queue: 9000q
+  receiving-queue: 9001q
