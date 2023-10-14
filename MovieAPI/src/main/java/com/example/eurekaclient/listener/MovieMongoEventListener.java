@@ -1,7 +1,9 @@
 package com.example.eurekaclient.listener;
 
 import com.example.eurekaclient.config.AppProperties;
+import com.example.eurekaclient.domain.DbOperation;
 import com.example.eurekaclient.domain.Movie;
+import com.example.eurekaclient.domain.MovieEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -30,14 +32,14 @@ public class MovieMongoEventListener extends AbstractMongoEventListener<Movie> {
     @Override
     public void onAfterSave(AfterSaveEvent<Movie> event) {
         Movie savedMovie = event.getSource();
+        log.info("savedMovie : {}", savedMovie);
         rabbitTemplate.convertAndSend(appProperties.sendingQueue() + "Exchange",
-                appProperties.sendingQueue() + "RoutingKey", savedMovie.getName());
+                appProperties.sendingQueue() + "RoutingKey", new MovieEvent(savedMovie, DbOperation.SAVE));
         log.info("Saved to db : {}", event.getSource());
     }
 
     @Override
     public void onAfterDelete(AfterDeleteEvent<Movie> event) {
-        log.info("Deleted from db : {}", event.getDocument());
     }
 
 }

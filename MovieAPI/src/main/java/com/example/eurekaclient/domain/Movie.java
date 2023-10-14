@@ -3,6 +3,9 @@ package com.example.eurekaclient.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Document
@@ -14,6 +17,20 @@ public class Movie extends MongoDocument {
     public BigDecimal budget;
 
     public String description;
+
+    public Movie() {
+    }
+
+    public Movie(MovieEvent movieEvent) {
+        this.uuid = movieEvent.uuid();
+        this.name = movieEvent.name();
+        this.actors = movieEvent.actors();
+        this.budget = movieEvent.bugdet();
+        this.description = movieEvent.description();
+        this.lastUpdatedTime = ZonedDateTime.parse(movieEvent.lastUpdatedTime(),
+                DateTimeFormatter.ofPattern(("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSX"))).toInstant();
+    }
+
     public String getName() {
         return name;
     }
