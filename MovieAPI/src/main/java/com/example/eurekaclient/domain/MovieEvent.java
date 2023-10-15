@@ -17,5 +17,9 @@ public record MovieEvent(
         this(movie.getUuid(),movie.getName(), movie.getActors(), movie.getBudget(),
                 movie.getDescription(),movie.getLastUpdatedTime().toString(), dbOperation);
     }
+
+    public MovieEvent(UUID uuid, DbOperation dbOperation){
+        this(uuid,null,null,null,null,null,dbOperation);
+    }
 }
 

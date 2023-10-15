@@ -6,24 +6,31 @@ import com.example.eurekaclient.repository.MovieRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @EnableRabbit
-public class RabbitListener {
-    private final Logger log = LoggerFactory.getLogger(RabbitListener.class);
+public class RabbitMoviesListener {
+    private final Logger log = LoggerFactory.getLogger(RabbitMoviesListener.class);
     private final MovieRepository movieRepository;
 
-    public RabbitListener(MovieRepository movieRepository) {
+    public RabbitMoviesListener(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
     }
 
 
-    @org.springframework.amqp.rabbit.annotation.RabbitListener(queues = "${moviesapi.receiving-queue}")
+    @RabbitListener(queues = "${moviesapi.receiving-queue}")
     public void receiveMessage(MovieEvent movieEvent) {
         log.info("Recive  : {}", movieEvent);
         if (movieEvent.dbOperation().equals(DbOperation.SAVE)){
-            movieRepository.save(new Movie(movieEvent));
+            var toSave = new Movie(movieEvent);
+            if (!movieRepository.existsByUuidAndLastUpdatedTimeIs(toSave.getUuid(), toSave.getLastUpdatedTime()))
+                movieRepository.save(toSave);
+        }
+        if (movieEvent.dbOperation().equals(DbOperation.DELETE)){
+            if (movieRepository.existsByUuid(movieEvent.uuid()))
+                movieRepository.deleteById(movieEvent.uuid());
         }
     }
 }

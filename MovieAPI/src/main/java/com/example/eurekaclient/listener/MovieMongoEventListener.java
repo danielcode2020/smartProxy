@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.event.AfterDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
+import java.util.UUID;
 
 @Component
 public class MovieMongoEventListener extends AbstractMongoEventListener<Movie> {
@@ -35,11 +35,15 @@ public class MovieMongoEventListener extends AbstractMongoEventListener<Movie> {
         log.info("savedMovie : {}", savedMovie);
         rabbitTemplate.convertAndSend(appProperties.sendingQueue() + "Exchange",
                 appProperties.sendingQueue() + "RoutingKey", new MovieEvent(savedMovie, DbOperation.SAVE));
-        log.info("Saved to db : {}", event.getSource());
     }
 
     @Override
     public void onAfterDelete(AfterDeleteEvent<Movie> event) {
+        UUID uuid = UUID.fromString(event.getSource().get("_id").toString());
+        log.info("deleted movie : {}", uuid);
+        rabbitTemplate.convertAndSend(appProperties.sendingQueue() + "Exchange",
+                appProperties.sendingQueue() + "RoutingKey",
+                new MovieEvent(uuid,DbOperation.DELETE));
     }
 
 }
