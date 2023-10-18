@@ -1,21 +1,15 @@
 version: '3.1'
 services:
-#  gateway-app:
-#    image: 'danielmarandici/movies_gateway:tagname'
-#    ports:
-#      - "8088:8088"
-#    environment:
-#      - SERVER_PORT=8088
-#      - SPRING_APPLICATION_NAME=gateway-app
-#      - SPRING_CLOUD_GATEWAY_ROUTES_0_ID=route1
-#      - SPRING_CLOUD_GATEWAY_ROUTES_0_URI=lb://eureka-client
-#      - SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0=Path=/movies
-#      - SPRING_CLOUD_GATEWAY_ROUTES_0_FILTERS_0=RewritePath=/movies,/api/movies
-#
-#      - SPRING_CLOUD_GATEWAY_ROUTES_1_ID=route2
-#      - SPRING_CLOUD_GATEWAY_ROUTES_1_URI=lb://eureka-client
-#      - SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0=Path=/movies/**
-#      - SPRING_CLOUD_GATEWAY_ROUTES_1_FILTERS_0=RewritePath=/movies/(?<segment>.*),/api/movies/$${segment}
+  gateway-app:
+    image: 'danielmarandici/movies_gateway:tagname'
+    ports:
+      - "8088:8088"
+    environment:
+      eureka.instance.preferIpAddress: true
+      eureka.client.serviceUrl.defaultZone: http://eurekaserver:8761/eureka/
+      eureka.host: eurekaserver
+    networks:
+      - ms-network
   eurekaserver:
     image: 'danielmarandici/eureka_server:tagname'
     environment:
