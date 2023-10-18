@@ -30,7 +30,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
-      MONGO_INITDB_DATABASE: movies1
     networks:
       - ms-network
   rabbitmq:
@@ -48,7 +47,7 @@ services:
       - '5672:5672'
     networks:
       - ms-network
-  eureka-client:
+  eureka-client-1:
     image: 'danielmarandici/movies_api:tagname'
     environment:
       spring.rabbitmq.host: rabbitmq
@@ -74,6 +73,34 @@ services:
       - eurekaserver
     ports:
       - '9001:9001'
+    networks:
+      - ms-network
+  eureka-client-2:
+    image: 'danielmarandici/movies_api:tagname'
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.rabbitmq.username: rmuser
+      spring.rabbitmq.password: rmpassword
+      spring.data.mongodb.host: mongodb
+      spring.data.mongodb.port: 27017
+      spring.data.mongodb.username: root
+      spring.data.mongodb.password: root
+      spring.data.mongodb.authenticationDatabase: admin
+      spring.data.mongodb.database: movies
+      server.port: 9000
+      spring.application.name: eureka-client
+      springdoc.swaggerUi.Path: /swagger-ui.html
+      moviesapi.sendingQueue: 9001q
+      moviesapi.receivingQueue: 9000q
+      eureka.instance.preferIpAddress: true
+      eureka.client.serviceUrl.defaultZone: http://eurekaserver:8761/eureka/
+      eureka.host: eurekaserver
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - eurekaserver
+    ports:
+      - '9000:9000'
     networks:
       - ms-network
 
