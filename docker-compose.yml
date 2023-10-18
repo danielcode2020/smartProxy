@@ -1,0 +1,88 @@
+version: '3.1'
+services:
+#  gateway-app:
+#    image: 'danielmarandici/movies_gateway:tagname'
+#    ports:
+#      - "8088:8088"
+#    environment:
+#      - SERVER_PORT=8088
+#      - SPRING_APPLICATION_NAME=gateway-app
+#      - SPRING_CLOUD_GATEWAY_ROUTES_0_ID=route1
+#      - SPRING_CLOUD_GATEWAY_ROUTES_0_URI=lb://eureka-client
+#      - SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0=Path=/movies
+#      - SPRING_CLOUD_GATEWAY_ROUTES_0_FILTERS_0=RewritePath=/movies,/api/movies
+#
+#      - SPRING_CLOUD_GATEWAY_ROUTES_1_ID=route2
+#      - SPRING_CLOUD_GATEWAY_ROUTES_1_URI=lb://eureka-client
+#      - SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0=Path=/movies/**
+#      - SPRING_CLOUD_GATEWAY_ROUTES_1_FILTERS_0=RewritePath=/movies/(?<segment>.*),/api/movies/$${segment}
+  eurekaserver:
+    image: 'danielmarandici/eureka_server:tagname'
+    environment:
+      eureka.client.registerWithEureka: false
+      eureka.client.fetchRegistry: false
+      eureka.instance.preferIpAddress: true
+      eureka.client.serviceUrl.defaultZone: http://eurekaserver:8761/eureka/
+    ports:
+      - 8761:8761
+    networks:
+      - ms-network
+    depends_on:
+      - rabbitmq
+  mongodb:
+    image: mongo
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: movies1
+    networks:
+      - ms-network
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=rmuser
+      - RABBITMQ_DEFAULT_PASS=rmpassword
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648
+    volumes:
+      - ~/volumes/cnas/rabbitmq:/var/lib/rabbitmq
+    ports:
+      - '15673:15673'
+      - '5672:5672'
+    networks:
+      - ms-network
+  eureka-client:
+    image: 'danielmarandici/movies_api:tagname'
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.rabbitmq.username: rmuser
+      spring.rabbitmq.password: rmpassword
+      spring.data.mongodb.host: mongodb
+      spring.data.mongodb.port: 27017
+      spring.data.mongodb.username: root
+      spring.data.mongodb.password: root
+      spring.data.mongodb.authenticationDatabase: admin
+      spring.data.mongodb.database: movies1
+      server.port: 9001
+      spring.application.name: eureka-client
+      springdoc.swaggerUi.Path: /swagger-ui.html
+      moviesapi.sendingQueue: 9000q
+      moviesapi.receivingQueue: 9001q
+      eureka.instance.preferIpAddress: true
+      eureka.client.serviceUrl.defaultZone: http://eurekaserver:8761/eureka/
+      eureka.host: eurekaserver
+    depends_on:
+      - rabbitmq
+      - mongodb
+      - eurekaserver
+    ports:
+      - '9001:9001'
+    networks:
+      - ms-network
+
+networks:
+  ms-network:
+    driver: bridge
