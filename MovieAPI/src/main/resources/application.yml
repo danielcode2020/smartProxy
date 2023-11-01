@@ -1,8 +1,8 @@
 spring:
   rabbitmq:
     host: localhost
-    username: rmuser
-    password: rmpassword
+    username: guest
+    password: guest
   application:
     name: eureka-client
   data:

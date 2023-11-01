@@ -33,3 +33,9 @@ In RabbitMq we have 2 queues, one for senders and receivers. In our case MoviesA
 
 mvn spring-boot:run -Dspring-boot.run.profiles=dev1
 mvn spring-boot:run
+
+For lab 3
+
+1. Run tests before merging with main
+2. After pushing to main rebuild docker images and push
+
